@@ -12,7 +12,7 @@ pub struct Block {
     index: u64,
     timestamp: DateTime<Utc>,
     transactions: Vec<Transaction>,
-    proof: i64,
+    proof: u64,
     previous_hash: String,
 
     #[serde(skip)]
@@ -31,7 +31,7 @@ impl Block {
     pub fn new(
         chain: &Chain,
         transactions: Vec<Transaction>,
-        proof: i64,
+        proof: u64,
         previous_hash: String,
     ) -> Self {
         // let previous_hash = previous_hash.unwrap_or("");
@@ -52,6 +52,19 @@ impl Block {
 
     pub fn index(&self) -> u64 {
         self.index
+    }
+
+    pub fn previous_hash(&self) -> String {
+        format!("{}", self.previous_hash)
+    }
+    pub fn timestamp(&self) -> DateTime<Utc> {
+        self.timestamp
+    }
+    pub fn transactions(&self) -> &Vec<Transaction> {
+        &self.transactions
+    }
+    pub fn proof(&self) -> u64 {
+        self.proof
     }
 }
 

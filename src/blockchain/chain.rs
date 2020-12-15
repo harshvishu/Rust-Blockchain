@@ -1,9 +1,8 @@
-use std::collections::HashSet;
-use std::vec::Vec;
-use std::io::{Read, Cursor};
-use uuid::Uuid;
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
+use std::collections::HashSet;
+use std::io::Cursor;
+use std::vec::Vec;
+use uuid::Uuid;
 
 use super::{Block, Transaction};
 use crate::sha;
@@ -48,16 +47,10 @@ impl Chain {
     pub fn new_block(&mut self, previous_hash: Option<String>, proof: u64) {
         let previous_hash: String = match previous_hash {
             Some(previous_hash) => previous_hash.to_string(),
-            None => {
-                match self.chain.last_mut() {
-                    Some(last_block) => {
-                        Chain::hash(last_block)
-                    }
-                    None => {
-                        "".to_string()
-                    }
-                }
-            }
+            None => match self.chain.last_mut() {
+                Some(last_block) => Chain::hash(last_block),
+                None => "".to_string(),
+            },
         };
 
         let block = Block::new(
@@ -73,11 +66,9 @@ impl Chain {
     pub fn new_transaction(&mut self, sender: String, recipient: String, amount: u64) -> u64 {
         // let transaction = Transaction::new(sender, recipient, amount);
         // let new_index: u64 = (self.count() + 1) as u64;
-        self.current_transactions.push(Transaction::new(sender, recipient, amount));
-        match self.chain.last() {
-            Some(last_block) => last_block.index(),
-            None => 0
-        }
+        self.current_transactions
+            .push(Transaction::new(sender, recipient, amount));
+        (self.current_transactions.len() - 1 ) as u64
     }
 
     pub fn hash(block: &Block) -> String {
@@ -130,7 +121,15 @@ impl Chain {
         Uuid::new_v4().to_string()
     }
 
+    pub fn current_transactions(&self) -> &Vec<Transaction> {
+        &self.current_transactions
+    }
+
     pub fn count(&self) -> usize {
         self.chain.len()
+    }
+
+    pub fn to_json(&self) -> String {
+        serde_json::to_string_pretty(&self).unwrap_or("".to_string())
     }
 }

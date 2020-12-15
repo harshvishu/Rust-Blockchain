@@ -15,4 +15,8 @@ impl Transaction {
             amount,
         }
     }
+
+    pub fn to_json(&self) -> String {
+        serde_json::to_string_pretty(&self).unwrap_or("".to_string())
+    }
 }

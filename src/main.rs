@@ -1,12 +1,10 @@
 #![allow(dead_code)]
+#![feature(proc_macro_hygiene, decl_macro)]
 
-use blockchain::{Block, Chain, Transaction};
-use chrono::format::Numeric::Timestamp;
-use chrono::Utc;
-use serde::{Deserialize, Serialize};
-use serde_json::Result;
+use blockchain::{Chain};
 
 mod blockchain;
+mod server;
 mod sha;
 
 fn main() {
@@ -17,7 +15,7 @@ fn main() {
     let last_proof = last_block.and_then(|e| Some(e.proof()));
     let proof = match last_proof {
         Some(last_proof) => Chain::proof_of_work(last_proof),
-        None => 0
+        None => 0,
     };
 
     chain.new_transaction("0".to_string(), Chain::node_identifier(), 1);
@@ -72,4 +70,6 @@ fn main() {
     // chain.chain().push(block);
 
     // dbg!(chain);
+
+    server::rocket().launch();
 }

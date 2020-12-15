@@ -5,7 +5,7 @@ use std::io::{Error, ErrorKind};
 use std::str;
 use std::vec::Vec;
 use serde_json::{Result as JsonResult};
-use super::{Chain, Transaction};
+use super::{Chain, Transaction, transaction};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Block {
@@ -59,6 +59,10 @@ impl Block {
     }
     pub fn proof(&self) -> u64 {
         self.proof
+    }
+    
+    pub fn to_json(&self) -> String {
+        serde_json::to_string_pretty(&self).unwrap_or("".to_string())
     }
 }
 

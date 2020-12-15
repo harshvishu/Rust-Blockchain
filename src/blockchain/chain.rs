@@ -80,27 +80,46 @@ impl Chain {
         }
     }
 
-    pub fn hash(block: &mut Block) -> String {
-        sha::calc_sha_sum(block).hash_string()
+    pub fn hash(block: &Block) -> String {
+        let json = serde_json::to_string(block).unwrap();
+        let readable_string = Cursor::new(&json);
+        sha::calc_sha_sum(readable_string).hash_string()
     }
 
     pub fn proof_of_work(last_proof: u64) -> u64 {
         let mut proof: u64 = 0;
-        while Chain::valid_proof(last_proof, proof) {
+        while Chain::is_valid_proof(last_proof, proof) {
             proof += 1;
         }
         proof
     }
 
-    pub fn valid_proof(last_proof: u64, proof: u64) -> bool {
+    pub fn is_valid_proof(last_proof: u64, proof: u64) -> bool {
         let guess = format!("{}{}", last_proof, proof);
         let readable_guess = Cursor::new(&guess);
         let guess_hash = sha::calc_sha_sum(readable_guess);
         guess_hash.hash_string().ends_with(&guess)
     }
 
-    pub fn is_valid_chain(chain: Vec<Block>) -> bool {
-        false
+    pub fn is_valid_chain(chain: &Vec<Block>) -> bool {
+        let chain_size = chain.len();
+        let mut last_block = chain.first().unwrap();
+        let mut current_index = 1;
+
+        while current_index < chain_size {
+            let block = &chain[current_index];
+            let last_block_hash = Chain::hash(last_block);
+            if block.previous_hash() != last_block_hash {
+                return false;
+            }
+
+            if Chain::is_valid_proof(last_block.proof(), block.proof()) {
+                return false;
+            }
+            last_block = block;
+            current_index += 1;
+        }
+        true
     }
 
     pub fn last_block(&mut self) -> Option<&mut Block> {

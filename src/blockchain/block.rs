@@ -4,10 +4,10 @@ use std::io::Read;
 use std::io::{Error, ErrorKind};
 use std::str;
 use std::vec::Vec;
-
+use serde_json::{Result as JsonResult};
 use super::{Chain, Transaction};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Block {
     index: u64,
     timestamp: DateTime<Utc>,
@@ -20,12 +20,6 @@ pub struct Block {
     #[serde(skip)]
     encoded: Option<Vec<u8>>,
 }
-
-// impl Debug for Block {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "{}\n{}\n{}\n{}\n{}", self.index, self.timestamp, self.transactions.len(), self.proof, self.previous_hash)
-//     }
-// }
 
 impl Block {
     pub fn new(

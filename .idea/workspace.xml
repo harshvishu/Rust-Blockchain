@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="bfe401a4-6859-4bc6-9643-56d4298bfc26" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/blockchain/block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain/block.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/blockchain/chain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain/chain.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
@@ -100,5 +99,17 @@
       <updated>1606629304352</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>

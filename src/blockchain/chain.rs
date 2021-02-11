@@ -1,11 +1,11 @@
+use super::{Block, Transaction};
+use crate::sha;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::Cursor;
 use std::vec::Vec;
 use uuid::Uuid;
-
-use super::{Block, Transaction};
-use crate::sha;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Chain {
@@ -68,7 +68,7 @@ impl Chain {
         // let new_index: u64 = (self.count() + 1) as u64;
         self.current_transactions
             .push(Transaction::new(sender, recipient, amount));
-        (self.current_transactions.len() - 1 ) as u64
+        (self.current_transactions.len() - 1) as u64
     }
 
     pub fn hash(block: &Block) -> String {
@@ -113,6 +113,71 @@ impl Chain {
         true
     }
 
+    pub fn register_node(&mut self, node: &str) {
+        match Url::parse(node) {
+            Ok(url) => {
+                if let Some(host) = url.host_str() {
+                    print!("new node : {} inserted.", host);
+                    self.nodes.insert(host.to_string());
+                }
+            }
+            Err(err) => {
+                dbg!(err);
+            }
+        }
+    }
+
+    pub fn resolve_conflicts(&mut self) -> bool {
+        let neighbours = &self.nodes;
+        let mut new_chain: Vec<Block> = vec![];
+        let mut max_length = self.chain.len();
+        let mut chain_replaced = false;
+
+        println!("... Resolving conflicts");
+
+        for node in neighbours.iter() {
+            let url = Url::parse(format!("http://{}:5000/chain", node).as_str()).unwrap();
+            println!("... connecting to {}", url);
+            match reqwest::blocking::get(url) {
+                Ok(response) => {
+                    #[derive(Deserialize, Debug)]
+                    struct ResponseChain {
+                        chain: Vec<Block>,
+                        length: usize
+                    }
+
+                    match response.json::<ResponseChain>() {
+                        Ok(data) => {
+                            print!("{:?}", data);
+                            if data.length > max_length && Chain::is_valid_chain(&data.chain) {
+                                max_length = data.length;
+                                new_chain = data.chain;
+                                chain_replaced = true;
+
+                                println!("... Chain was replaced");
+                            }
+                        }
+                        Err(err) => {
+                            dbg!(err);
+                        }
+                    }
+                }
+                Err(err) => {
+                    dbg!(err);
+                }
+            }
+        }
+
+        if chain_replaced {
+            self.chain.clear();
+            self.chain.append(&mut new_chain);
+        }
+
+        println!("... Finished resolving conflicts");
+
+        return true;
+    }
+
     pub fn last_block(&mut self) -> Option<&mut Block> {
         self.chain.last_mut()
     }
@@ -129,7 +194,15 @@ impl Chain {
         self.chain.len()
     }
 
+    pub fn nodes(&self) -> &HashSet<String> {
+        &self.nodes
+    }
+
     pub fn to_json(&self) -> String {
-        serde_json::to_string_pretty(&self).unwrap_or("".to_string())
+        let response = serde_json::json!({
+             "chain" : self.chain,
+             "length" : self.count()
+        });
+        response.to_string()
     }
 }

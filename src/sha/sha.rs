@@ -21,7 +21,7 @@ pub fn calc_sha_sum(mut x: impl Read) -> Sha256State {
 
                     // Pad whatever data is left in the buffer.
                     if datalen < 56 {
-                        println!("{}<56", datalen);
+                        // println!("{}<56", datalen);
                         buffer[i] = 0x80;
                         i += 1;
                         while i < 56 {
@@ -29,7 +29,7 @@ pub fn calc_sha_sum(mut x: impl Read) -> Sha256State {
                             i += 1;
                         }
                     } else {
-                        println!("{}>=56", datalen);
+                        // println!("{}>=56", datalen);
                         buffer[i] = 0x80;
                         i += 1;
                         while i < 64 {

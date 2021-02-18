@@ -2,7 +2,7 @@ use super::{Block, Transaction};
 use crate::sha;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashSet};
 use std::io::Cursor;
 use std::vec::Vec;
 use uuid::Uuid;
@@ -13,21 +13,6 @@ pub struct Chain {
     current_transactions: Vec<Transaction>,
     nodes: HashSet<String>,
 }
-
-// pub trait Chain {
-//     fn get_chain(&mut self) -> &mut Vec<Block>;
-//     // fn get_current_transactions(&self) -> &Vec<Transaction>;
-//     // fn get_nodes() -> HashSet<String>;
-//     // fn new_block(previous_hash: String, proof: i64) -> Block;
-//     // fn new_transaction(sender: String, recipient: String, amount: i64) -> i64;
-//     // fn get_last_block() -> Block;
-//     // fn hash(block: Block) -> String;
-//     // fn proof_of_work(last_proof: i64) -> i64;
-//     // fn valid_proof(last_proof: i64, proof: i64) -> bool;
-//     // fn register_node(address: String) -> bool;
-//     // fn is_valid_chain(chain: [Block]) -> bool;
-//     // fn resolve_conflicts() -> bool;
-// }
 
 impl Chain {
     pub(crate) fn new() -> Self {
@@ -64,8 +49,6 @@ impl Chain {
     }
 
     pub fn new_transaction(&mut self, sender: String, recipient: String, amount: u64) -> u64 {
-        // let transaction = Transaction::new(sender, recipient, amount);
-        // let new_index: u64 = (self.count() + 1) as u64;
         self.current_transactions
             .push(Transaction::new(sender, recipient, amount));
         (self.current_transactions.len() - 1) as u64

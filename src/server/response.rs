@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use crate::Block;
-use crate::Chain;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NodeResponse {

@@ -2,7 +2,7 @@ use crate::Chain;
 use rocket::*;
 use rocket_contrib::json::{Json, JsonValue};
 use serde::{Deserialize, Serialize};
-use std::{borrow::Borrow, sync::Mutex};
+use std::{sync::Mutex};
 use rocket::config::{Config, Environment};
 use rocket::response::status;
 
@@ -71,12 +71,14 @@ fn nodes(state: State<Mutex<Chain>>) -> JsonValue {
     json!(chain.nodes())
 }
 
+#[catch(500)]
+fn internal_error() -> &'static str {
+    "Whoops! Looks like we messed up."
+}
+
 #[catch(404)]
-fn not_found() -> JsonValue {
-    json!({
-        "status": "error",
-        "reason": "Resource was not found."
-    })
+fn not_found(req: &Request) -> String {
+    format!("I couldn't find '{}'. Try something else?", req.uri())
 }
 
 pub fn rocket() -> rocket::Rocket {
@@ -88,6 +90,6 @@ pub fn rocket() -> rocket::Rocket {
 
     rocket::custom(config)
         .manage(chain)
-        .mount("/", routes![index, chain, mine, new_transaction, resolve, register_node, nodes])
-        .register(catchers![not_found])
+        .register(catchers![not_found, internal_error])
+        .mount("/", routes![index, chain, mine, new_transaction, resolve, register_node, nodes])       
 }

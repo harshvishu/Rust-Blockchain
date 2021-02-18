@@ -1,9 +1,6 @@
 #![allow(dead_code)]
 #![feature(proc_macro_hygiene, decl_macro)]
-
 #[macro_use] extern crate rocket_contrib;
-
-use blockchain::{Chain, Block};
 
 mod blockchain;
 mod server;

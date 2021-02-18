@@ -1,4 +1,4 @@
-use crate::Chain;
+use crate::blockchain::Chain;
 use rocket::*;
 use rocket_contrib::json::{Json, JsonValue};
 use serde::{Deserialize, Serialize};

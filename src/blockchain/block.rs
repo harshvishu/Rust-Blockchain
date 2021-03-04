@@ -36,28 +36,31 @@ impl Block {
         }
     }
 
-    pub fn update_index(&mut self, index: u64) {
-        self.index = index;
-    }
+    // pub fn update_index(&mut self, index: u64) {
+    //     self.index = index;
+    // }
 
-    pub fn index(&self) -> u64 {
-        self.index
-    }
+    // pub fn index(&self) -> u64 {
+    //     self.index
+    // }
 
     pub fn previous_hash(&self) -> String {
         format!("{}", self.previous_hash)
     }
-    pub fn timestamp(&self) -> DateTime<Utc> {
-        self.timestamp
-    }
-    pub fn transactions(&self) -> &Vec<Transaction> {
-        &self.transactions
-    }
+
+    // pub fn timestamp(&self) -> DateTime<Utc> {
+    //     self.timestamp
+    // }
+
+    // pub fn transactions(&self) -> &Vec<Transaction> {
+    //     &self.transactions
+    // }
+    
     pub fn proof(&self) -> u64 {
         self.proof
     }
     
-    pub fn to_json(&self) -> String {
-        serde_json::to_string_pretty(&self).unwrap_or("".to_string())
-    }
+    // pub fn to_json(&self) -> String {
+    //     serde_json::to_string_pretty(&self).unwrap_or("".to_string())
+    // }
 }

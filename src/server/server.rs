@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::{sync::Mutex};
 use rocket::config::{Config, Environment};
 use rocket::response::status;
+use rocket::http::{Status, ContentType};
+use std::io::Cursor;
 
 #[get("/")]
 fn index(state: State<Mutex<Chain>>) -> String {
@@ -13,23 +15,36 @@ fn index(state: State<Mutex<Chain>>) -> String {
 }
 
 #[get("/chain")]
-fn chain(state: State<Mutex<Chain>>) -> String {
+fn chain(state: State<Mutex<Chain>>) -> Response {
     let chain = state.lock().unwrap();
-    chain.to_json()
+    let response = Response::build()
+        .status(Status::Ok)
+        .header(ContentType::JSON)
+        .sized_body(Cursor::new(chain.to_json()))
+        .finalize();
+    response
 }
 
 #[get("/mine")]
-fn mine(state: State<Mutex<Chain>>) -> String {
+fn mine(state: State<Mutex<Chain>>) -> Response {
     let mut chain = state.lock().unwrap();
-
-    match chain.last_block() {
+    let result = match chain.last_block() {
         Some(last_block) => {
+            let last_proof = last_block.proof();
+            let proof = Chain::proof_of_work(last_proof);
             let previous_hash = Chain::hash(last_block);
-            chain.new_block(Some(previous_hash), 200);
+            chain.new_block(Some(previous_hash), proof);
             chain.to_json()
         }
         None => "502 Internal Server error".to_string(),
-    }
+    };
+
+    let response = Response::build()
+        .status(Status::Ok)
+        .header(ContentType::JSON)
+        .sized_body(Cursor::new(result))
+        .finalize();
+    response
 }
 
 #[derive(Serialize, Deserialize)]

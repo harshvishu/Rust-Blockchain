@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{HashSet};
 use std::io::Cursor;
 use std::vec::Vec;
-use uuid::Uuid;
+// use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Chain {
@@ -23,10 +23,6 @@ impl Chain {
         };
         chain.new_block(Some("1".to_string()), 100);
         return chain;
-    }
-
-    pub fn chain(&self) -> &Vec<Block> {
-        &self.chain
     }
 
     pub fn new_block(&mut self, previous_hash: Option<String>, proof: u64) {
@@ -62,7 +58,7 @@ impl Chain {
 
     pub fn proof_of_work(last_proof: u64) -> u64 {
         let mut proof: u64 = 0;
-        while Chain::is_valid_proof(last_proof, proof) {
+        while !Chain::is_valid_proof(last_proof, proof) {
             proof += 1;
         }
         proof
@@ -72,7 +68,7 @@ impl Chain {
         let guess = format!("{}{}", last_proof, proof);
         let readable_guess = Cursor::new(&guess);
         let guess_hash = sha::calc_sha_sum(readable_guess);
-        guess_hash.hash_string().ends_with(&guess)
+        guess_hash.hash_string().ends_with("0000")
     }
 
     pub fn is_valid_chain(chain: &Vec<Block>) -> bool {
@@ -165,9 +161,9 @@ impl Chain {
         self.chain.last_mut()
     }
 
-    pub fn node_identifier() -> String {
-        Uuid::new_v4().to_string()
-    }
+    // pub fn node_identifier() -> String {
+    //     Uuid::new_v4().to_string()
+    // }
 
     pub fn current_transactions(&self) -> &Vec<Transaction> {
         &self.current_transactions

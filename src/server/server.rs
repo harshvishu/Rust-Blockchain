@@ -86,15 +86,15 @@ fn nodes(state: State<Mutex<Chain>>) -> JsonValue {
     json!(chain.nodes())
 }
 
-#[catch(500)]
-fn internal_error() -> &'static str {
-    "Whoops! Looks like we messed up."
-}
-
-#[catch(404)]
-fn not_found(req: &Request) -> String {
-    format!("I couldn't find '{}'. Try something else?", req.uri())
-}
+// #[catch(500)]
+// fn internal_error() -> &'static str {
+//     "Whoops! Looks like we messed up."
+// }
+//
+// #[catch(404)]
+// fn not_found(req: &Request) -> String {
+//     format!("I couldn't find '{}'. Try something else?", req.uri())
+// }
 
 pub fn rocket() -> rocket::Rocket {
     let chain = Mutex::new(Chain::new());
@@ -105,6 +105,6 @@ pub fn rocket() -> rocket::Rocket {
 
     rocket::custom(config)
         .manage(chain)
-        .register(catchers![not_found, internal_error])
+        // .register(catchers![not_found, internal_error])
         .mount("/", routes![index, chain, mine, new_transaction, resolve, register_node, nodes])       
 }

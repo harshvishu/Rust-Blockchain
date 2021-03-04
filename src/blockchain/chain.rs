@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::{HashSet};
 use std::io::Cursor;
 use std::vec::Vec;
-// use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Chain {
@@ -15,7 +14,7 @@ pub struct Chain {
 }
 
 impl Chain {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         let mut chain = Chain {
             chain: vec![],
             current_transactions: vec![],
@@ -44,18 +43,41 @@ impl Chain {
         self.current_transactions.clear();
     }
 
+    /**
+ Creates a new transaction to go into the next mined Block
+
+ - Parameter sender: Address of the Sender
+ - Parameter recipient: Address of the Recipient
+ - Parameter amount: Amount
+ - returns: The index of the Block that will hold this transaction
+  */
     pub fn new_transaction(&mut self, sender: String, recipient: String, amount: u64) -> u64 {
         self.current_transactions
             .push(Transaction::new(sender, recipient, amount));
         (self.current_transactions.len() - 1) as u64
     }
 
+    /**
+ Creates a SHA-256 hash of a Block
+
+ - Parameter block: <dict> Block
+ - returns: String
+
+ */
     pub fn hash(block: &Block) -> String {
         let json = serde_json::to_string(block).unwrap();
         let readable_string = Cursor::new(&json);
         sha::calc_sha_sum(readable_string).hash_string()
     }
 
+    /**
+ Simple Proof of Work Algorithm:
+
+ - Find a number p' such that hash(pp') contains leading 4 zeroes, where p is the previous p'
+ - p is the previous proof, and p' is the new proof
+ - Parameter: last_proof: Int64
+ - returns: Int64
+ */
     pub fn proof_of_work(last_proof: u64) -> u64 {
         let mut proof: u64 = 0;
         while !Chain::is_valid_proof(last_proof, proof) {
@@ -64,6 +86,13 @@ impl Chain {
         proof
     }
 
+    /**
+ Validates the Proof: Does hash(last_proof, proof) contain 4 leading zeroes?
+
+ - Parameter last_proof: <int> Previous Proof
+ - Parameter proof: <int> Current Proof
+ - returns: True if correct, False if not.
+ */
     pub fn is_valid_proof(last_proof: u64, proof: u64) -> bool {
         let guess = format!("{}{}", last_proof, proof);
         let readable_guess = Cursor::new(&guess);
@@ -160,10 +189,6 @@ impl Chain {
     pub fn last_block(&mut self) -> Option<&mut Block> {
         self.chain.last_mut()
     }
-
-    // pub fn node_identifier() -> String {
-    //     Uuid::new_v4().to_string()
-    // }
 
     pub fn current_transactions(&self) -> &Vec<Transaction> {
         &self.current_transactions

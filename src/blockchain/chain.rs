@@ -190,10 +190,6 @@ impl Chain {
         self.chain.last_mut()
     }
 
-    pub fn current_transactions(&self) -> &Vec<Transaction> {
-        &self.current_transactions
-    }
-
     pub fn count(&self) -> usize {
         self.chain.len()
     }

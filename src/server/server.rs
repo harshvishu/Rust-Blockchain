@@ -61,7 +61,7 @@ fn new_transaction(body: Option<Json<TransactionRequest>>, state: State<Mutex<Ch
         Some(json) => {
             let index = chain.new_transaction(json.0.sender, json.0.recipient, json.0.amount);
             let result = json!({
-             "message" : index,
+             "message" : format!("Transaction will be added to the block {}", index),
         }).to_string();
             response_builder
                 .status(Status::Ok)

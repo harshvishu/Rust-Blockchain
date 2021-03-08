@@ -70,7 +70,7 @@ fn new_transaction(body: Option<Json<TransactionRequest>>, state: State<Mutex<Ch
                 .finalize()
         }
         None => response_builder
-            .status(Status::Ok)
+            .status(Status::BadRequest)
             .header(ContentType::HTML)
             .sized_body(Cursor::new("400 Bad request")).finalize()
     }

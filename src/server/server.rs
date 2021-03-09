@@ -4,7 +4,7 @@ use rocket_contrib::json::{Json, JsonValue};
 use serde::{Deserialize, Serialize};
 use std::{sync::Mutex};
 use rocket::config::{Config, Environment};
-use rocket::response::{status, Redirect, Response};
+use rocket::response::{Redirect, Response};
 use rocket::http::{Status, ContentType};
 use std::io::Cursor;
 
@@ -19,7 +19,7 @@ fn chain(state: State<Mutex<Chain>>) -> Response {
     let response = Response::build()
         .status(Status::Ok)
         .header(ContentType::JSON)
-        .sized_body(Cursor::new(chain.to_json()))
+        .sized_body(Cursor::new(chain.to_json().to_string()))
         .finalize();
     response
 }
@@ -27,23 +27,34 @@ fn chain(state: State<Mutex<Chain>>) -> Response {
 #[get("/mine")]
 fn mine(state: State<Mutex<Chain>>) -> Response {
     let mut chain = state.lock().unwrap();
+    let mut response_builder = Response::build();
     let result = match chain.last_block() {
         Some(last_block) => {
             let last_proof = last_block.proof();
             let proof = Chain::proof_of_work(last_proof);
             let previous_hash = Chain::hash(last_block);
-            chain.new_block(Some(previous_hash), proof);
-            chain.to_json()
-        }
-        None => "502 Internal Server error".to_string(),
-    };
+            let block = chain.new_block(Some(previous_hash.to_owned()), proof);
 
-    let response = Response::build()
-        .status(Status::Ok)
-        .header(ContentType::JSON)
-        .sized_body(Cursor::new(result))
-        .finalize();
-    response
+            let result = json!({
+             "message" : "New block forged",
+             "proof" : proof,
+             "previous_hash": previous_hash,
+             "index" : block.0,
+             "transactions" : block.1,
+        }).to_string();
+            response_builder
+                .status(Status::Ok)
+                .header(ContentType::JSON)
+                .sized_body(Cursor::new(result))
+        }
+        None => {
+            response_builder
+                .status(Status::InternalServerError)
+                .header(ContentType::HTML)
+                .sized_body(Cursor::new("Unable to mine a new block"))
+        }
+    };
+    result.finalize()
 }
 
 #[derive(Serialize, Deserialize)]
@@ -54,33 +65,37 @@ struct TransactionRequest {
 }
 
 #[post("/transactions/new", format = "json", data = "<body>")]
-fn new_transaction(body: Option<Json<TransactionRequest>>, state: State<Mutex<Chain>>) -> Response {
+fn new_transaction(body: Json<TransactionRequest>, state: State<Mutex<Chain>>) -> Response {
     let mut chain = state.lock().unwrap();
-    let mut response_builder = Response::build();
-    match body {
-        Some(json) => {
-            let index = chain.new_transaction(json.0.sender, json.0.recipient, json.0.amount);
-            let result = json!({
-             "message" : format!("Transaction will be added to the block {}", index),
+    let index = chain.new_transaction(body.0.sender, body.0.recipient, body.0.amount);
+    let transaction = chain.current_transactions().get(index as usize);
+    let result = json!({
+             "message" : "Transaction added to the block",
+             "transaction" : transaction
         }).to_string();
-            response_builder
-                .status(Status::Ok)
-                .header(ContentType::JSON)
-                .sized_body(Cursor::new(result))
-                .finalize()
-        }
-        None => response_builder
-            .status(Status::BadRequest)
-            .header(ContentType::HTML)
-            .sized_body(Cursor::new("400 Bad request")).finalize()
-    }
+    let response = Response::build()
+        .status(Status::Ok)
+        .header(ContentType::JSON)
+        .sized_body(Cursor::new(result))
+        .finalize();
+    response
 }
 
 #[get("/nodes/resolve")]
-fn resolve(state: State<Mutex<Chain>>) -> status::Accepted<String> {
+fn resolve(state: State<Mutex<Chain>>) -> Response {
     let mut chain = state.lock().unwrap();
-    chain.resolve_conflicts();
-    status::Accepted(Some("processing".to_string()))
+    let result = chain.resolve_conflicts();
+    let message = if result { "Our chain was replaced" } else { "Our chain is authoritative" };
+    let result = json!({
+             "message" : message.to_string(),
+             "chain" : chain.to_json()
+        }).to_string();
+    let response = Response::build()
+        .status(Status::Ok)
+        .header(ContentType::JSON)
+        .sized_body(Cursor::new(result))
+        .finalize();
+    response
 }
 
 #[derive(Serialize, Deserialize)]
@@ -89,10 +104,20 @@ struct NodeRequest {
 }
 
 #[post("/nodes/register", format = "json", data = "<body>")]
-fn register_node(body: Json<NodeRequest>, state: State<Mutex<Chain>>) -> status::Accepted<String> {
+fn register_node(body: Json<NodeRequest>, state: State<Mutex<Chain>>) -> Response {
     let mut chain = state.lock().unwrap();
     body.nodes.iter().for_each(|node| chain.register_node(node));
-    status::Accepted(Some("nodes added".to_string()))
+
+    let result = json!({
+             "message" : format!("New nodes have been added"),
+             "nodes": chain.nodes()
+        }).to_string();
+    let response = Response::build()
+        .status(Status::Ok)
+        .header(ContentType::JSON)
+        .sized_body(Cursor::new(result))
+        .finalize();
+    response
 }
 
 #[get("/nodes")]
@@ -100,16 +125,6 @@ fn nodes(state: State<Mutex<Chain>>) -> JsonValue {
     let chain = state.lock().unwrap();
     json!(chain.nodes())
 }
-
-// #[catch(500)]
-// fn internal_error() -> &'static str {
-//     "Whoops! Looks like we messed up."
-// }
-//
-// #[catch(404)]
-// fn not_found(req: &Request) -> String {
-//     format!("I couldn't find '{}'. Try something else?", req.uri())
-// }
 
 /**
 Starting the web server:

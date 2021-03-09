@@ -36,4 +36,12 @@ impl Block {
     pub fn proof(&self) -> u64 {
         self.proof
     }
+
+    pub fn index(&self) -> u64 {
+        self.index
+    }
+
+    pub fn transactions(&self) -> &Vec<Transaction> {
+        &self.transactions
+    }
 }

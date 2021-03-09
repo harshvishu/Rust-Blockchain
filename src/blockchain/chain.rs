@@ -24,7 +24,7 @@ impl Chain {
         return chain;
     }
 
-    pub fn new_block(&mut self, previous_hash: Option<String>, proof: u64) {
+    pub fn new_block(&mut self, previous_hash: Option<String>, proof: u64) -> (u64, Vec<Transaction>) {
         let previous_hash: String = match previous_hash {
             Some(previous_hash) => previous_hash.to_string(),
             None => match self.chain.last_mut() {
@@ -37,10 +37,15 @@ impl Chain {
             &self,
             self.current_transactions.to_vec(),
             proof,
-            previous_hash.to_string(),
+            previous_hash,
         );
+
+        let return_value =  (block.index(), block.transactions().clone());
+
         self.chain.push(block);
         self.current_transactions.clear();
+
+        return_value
     }
 
     /**
@@ -49,7 +54,7 @@ impl Chain {
  - Parameter sender: Address of the Sender
  - Parameter recipient: Address of the Recipient
  - Parameter amount: Amount
- - returns: The index of the Block that will hold this transaction
+ - returns: The index of the newly created transaction
   */
     pub fn new_transaction(&mut self, sender: String, recipient: String, amount: u64) -> u64 {
         self.current_transactions
@@ -183,7 +188,7 @@ impl Chain {
 
         println!("... Finished resolving conflicts");
 
-        return true;
+        chain_replaced
     }
 
     pub fn last_block(&mut self) -> Option<&mut Block> {
@@ -198,11 +203,14 @@ impl Chain {
         &self.nodes
     }
 
-    pub fn to_json(&self) -> String {
+    pub fn current_transactions(&self) -> &Vec<Transaction> {
+        &self.current_transactions
+    }
+
+    pub fn to_json(&self) -> serde_json::Value {
         let response = serde_json::json!({
-             "chain" : self.chain,
-             "length" : self.count()
+             "chain" : self.chain
         });
-        response.to_string()
+        response
     }
 }

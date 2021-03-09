@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="bfe401a4-6859-4bc6-9643-56d4298bfc26" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blockchain/block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain/block.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/blockchain/chain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain/chain.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/blockchain/transaction.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain/transaction.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/server/server.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/server.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

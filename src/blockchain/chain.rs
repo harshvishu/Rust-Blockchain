@@ -208,9 +208,7 @@ impl Chain {
     }
 
     pub fn to_json(&self) -> serde_json::Value {
-        let response = serde_json::json!({
-             "chain" : self.chain
-        });
+        let response = serde_json::json!(self.chain);
         response
     }
 }

@@ -4,12 +4,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bfe401a4-6859-4bc6-9643-56d4298bfc26" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/blockchain/block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain/block.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/blockchain/chain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/blockchain/chain.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server/server.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/server.rs" afterDir="false" />
-    </list>
+    <list default="true" id="bfe401a4-6859-4bc6-9643-56d4298bfc26" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -95,6 +90,14 @@
       <option name="presentableId" value="Default" />
       <updated>1606629304352</updated>
     </task>
+    <task id="LOCAL-00001" summary="JSON tweaks">
+      <created>1615264974983</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1615264974983</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -108,5 +111,9 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="JSON tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="JSON tweaks" />
   </component>
 </project>

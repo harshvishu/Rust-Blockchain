@@ -16,3 +16,7 @@ Dependencies
 
 ### Run
 You can run your project by simply executing `cargo run` from project directory. The server should now be up and running at `localhost:5000`.
+
+### TODO
+- Test cases
+- Remove unused code

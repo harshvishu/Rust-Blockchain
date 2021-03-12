@@ -8,11 +8,9 @@ pub fn calc_sha_sum(mut x: impl Read) -> Sha256State {
         bit_length: 0,
     };
     let mut buffer: [u8; CHUNK_SIZE] = [0; CHUNK_SIZE];
-    // let mut buffer: Vec<u8> = Vec::new();
 
     loop {
         let result = x.read(buffer.as_mut());
-        // let mut buffer = vec![buffer];
         match result {
             Ok(datalen) => {
                 if datalen < buffer.len() {
@@ -77,8 +75,8 @@ impl Sha256State {
     pub fn hash_string(&self) -> String {
         format!(
             "{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
-            self.hash[1].to_le(),
             self.hash[0].to_le(),
+            self.hash[1].to_le(),
             self.hash[2].to_le(),
             self.hash[3].to_le(),
             self.hash[4].to_le(),
@@ -198,3 +196,17 @@ const SHA256_K_CONST: [u32; 64] = [
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::calc_sha_sum;
+    use std::io::Cursor;
+
+    #[test]
+    fn test_sha() {
+        let expectation = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5";
+        let input  = Cursor::new("12345");
+        let output = calc_sha_sum(input).hash_string();
+        assert_eq!(output, expectation);
+    }
+}

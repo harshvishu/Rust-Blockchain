@@ -1,4 +1,4 @@
-## [Blockchain in Rust](Add the link here) ##
+## [Blockchain in Rust](https://phychic-owl.medium.com/blockchain-in-rust-bf6f5783f8dd) ##
 ###### (_Follow to learn the step by step implementation _)
 ### Simple blockchain implementation in Rust programming language ###
 
